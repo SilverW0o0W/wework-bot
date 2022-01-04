@@ -18,7 +18,7 @@ def get_0_hour_stamp(timestamp):
     return int(time.mktime(date.timetuple()))
 
 
-class Script(object):
+class ProjectRobot(object):
     def __init__(self):
         self.now = int(time.time())
         config = {
@@ -94,8 +94,8 @@ class Script(object):
 
 
 def main():
-    s = Script()
-    s.run()
+    r = ProjectRobot()
+    r.run()
 
 
 if __name__ == '__main__':

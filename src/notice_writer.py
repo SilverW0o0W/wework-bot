@@ -12,7 +12,7 @@ import torndb
 import build_util
 
 
-class Script(object):
+class NoticeWriter(object):
     def __init__(self):
         self.now = int(time.time())
         config = {
@@ -93,8 +93,8 @@ class Script(object):
 
 
 def main():
-    s = Script()
-    s.run()
+    w = NoticeWriter()
+    w.run()
 
 
 if __name__ == '__main__':
