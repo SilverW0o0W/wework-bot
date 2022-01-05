@@ -69,3 +69,9 @@ class Connection(object):
                 raise e
             return -1, str(e)
         return last_rowid, ""
+
+    def read_list(self, sql, params):
+        return [
+            dict(item)
+            for item in self.db.execute(sql, params).fetchall()
+        ]

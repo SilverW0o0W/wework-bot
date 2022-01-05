@@ -1,3 +1,4 @@
 toml~=0.9.4
 requests~=2.2.1
+pymysql~=1.0.2
 SQLAlchemy~=1.4.29

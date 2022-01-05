@@ -5,12 +5,15 @@
 @create: 2021/12/20
 @brief:
 """
+import sys
 import time
 import datetime
 import json
 
-import torndb
 import requests
+
+import script_util
+import sqlalchemy_util
 
 
 def get_0_hour_stamp(timestamp):
@@ -19,11 +22,10 @@ def get_0_hour_stamp(timestamp):
 
 
 class ProjectRobot(object):
-    def __init__(self):
+    def __init__(self, config):
         self.now = int(time.time())
-        config = {
-        }
-        self.db = torndb.Connection(**config)
+        uri = sqlalchemy_util.build_db_uri(config)
+        self.engine = sqlalchemy_util.init_engine(uri)
 
     def get_notices(self, start, end):
         sql = """
@@ -43,8 +45,9 @@ class ProjectRobot(object):
         AND n.notice_time < %s
         AND n.status = 1
         """
-        params = [start, end, ]
-        return self.db.query(sql, *params)
+        params = (start, end,)
+        with sqlalchemy_util.Connection(self.engine) as conn:
+            return conn.read_list(sql, params)
 
     @staticmethod
     def get_content(notice_type, sub_type):
@@ -93,10 +96,11 @@ class ProjectRobot(object):
             self.send_notice(notice["webhook"], content)
 
 
-def main():
-    r = ProjectRobot()
-    r.run()
-
-
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) != 2:
+        print("Params error. python project_robot.py [config_path]")
+        exit(1)
+
+    toml_config = script_util.load_toml_config(sys.argv[1])
+    r = ProjectRobot(toml_config["BOT_DB"])
+    r.run()
