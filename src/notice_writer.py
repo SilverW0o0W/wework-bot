@@ -8,13 +8,14 @@
 
 import time
 
-import torndb
+import sqlalchemy_util
 
 
 class NoticeWriter(object):
     def __init__(self, config):
         self.now = int(time.time())
-        self.db = torndb.Connection(**config)
+        uri = sqlalchemy_util.build_db_uri(config)
+        self.engine = sqlalchemy_util.init_engine(uri)
 
     def write_project(self, project):
         sql = """
@@ -23,8 +24,9 @@ class NoticeWriter(object):
         VALUES 
         (%s, %s)
         """
-        params = [project["name"], project["url"], ]
-        return self.db.insert(sql, *params)
+        params = (project["name"], project["url"],)
+        with sqlalchemy_util.Connection(self.engine) as conn:
+            return conn.insert(sql, params)
 
     def write_robot(self, robot):
         sql = """
@@ -33,8 +35,9 @@ class NoticeWriter(object):
         VALUES 
         (%s, %s)
         """
-        params = [robot["name"], robot["webhook"], ]
-        return self.db.insert(sql, *params)
+        params = (robot["name"], robot["webhook"],)
+        with sqlalchemy_util.Connection(self.engine) as conn:
+            return conn.insert(sql, params)
 
     def write_notices(self, notices, created_time=None):
         created_time = created_time or int(time.time())
@@ -57,4 +60,5 @@ class NoticeWriter(object):
         VALUES 
         (%s, %s, %s, %s, %s, %s, %s, %s)
         """
-        return self.db.insertmany(sql, notice_tuple)
+        with sqlalchemy_util.Connection(self.engine) as conn:
+            return conn.insert_many(sql, notice_tuple)
