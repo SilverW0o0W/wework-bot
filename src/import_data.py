@@ -10,6 +10,7 @@ import sys
 import toml
 
 import build_util
+import script_util
 from notice_writer import NoticeWriter
 
 test_data = {
@@ -32,12 +33,6 @@ test_data = {
 }
 
 
-def load_config(config_path):
-    with open(config_path, "r") as f:
-        config = toml.load(f)
-    return config
-
-
 def run(config, data):
     writer = NoticeWriter(config)
     project_id, msg = writer.write_project(data["project"])
@@ -52,5 +47,5 @@ if __name__ == '__main__':
         print("Params error. python import_data.py [config_path]")
         exit(1)
 
-    toml_config = load_config(sys.argv[1])
+    toml_config = script_util.load_toml_config(sys.argv[1])
     run(toml_config["BOT_DB"], test_data)
