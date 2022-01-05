@@ -9,14 +9,11 @@
 import time
 
 import torndb
-import build_util
 
 
 class NoticeWriter(object):
-    def __init__(self):
+    def __init__(self, config):
         self.now = int(time.time())
-        config = {
-        }
         self.db = torndb.Connection(**config)
 
     def write_project(self, project):
@@ -61,41 +58,3 @@ class NoticeWriter(object):
         (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         return self.db.insertmany(sql, notice_tuple)
-
-    def run(self):
-        data = {
-            "project": {
-                "name": "",
-                "url": "",
-            },
-            "schedule": {
-                "开发": "2021-11-08",
-                "联调": "2021-12-30",
-                "提测": "2022-1-5",
-                "测试": "",
-                "上线": "2022-1-14",
-            },
-            "notice": {
-                "before": [1, 2, 3, 4, 5, ],
-                "start": [1, 2, 3, 4, 5, ],
-            },
-            "robot_id": 0,
-            "robot": {
-                "name": "",
-                "webhook": ""
-            }
-        }
-        project_id = self.write_project(data["project"])
-        robot_id = self.write_robot(data["robot"])
-        schedule_date = build_util.get_schedule_date(data["schedule"])
-        notices = build_util.build_notices_from_schedule(project_id, robot_id, schedule_date, data["notice"])
-        self.write_notices(notices)
-
-
-def main():
-    w = NoticeWriter()
-    w.run()
-
-
-if __name__ == '__main__':
-    main()
