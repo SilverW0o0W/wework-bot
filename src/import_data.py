@@ -7,7 +7,6 @@
 """
 
 import sys
-import toml
 
 import build_util
 import script_util
